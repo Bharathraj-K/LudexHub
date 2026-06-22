@@ -3,14 +3,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from core.paths import get_data_dir
+from core.paths import get_bundle_dir, get_data_dir
 
 DATA_DIR = get_data_dir()
 SETTINGS_FILE = DATA_DIR / "settings.json"
 
 DEFAULTS = {
     "hotkey": "alt+space",
-    "tray_icon": str(DATA_DIR / "icons" / "tray.ico"),
+    "tray_icon": str(get_bundle_dir() / "data" / "icons" / "tray.ico"),
     "theme": "cyberpunk",
     "font_family": "Orbitron",
     "position": "center",
