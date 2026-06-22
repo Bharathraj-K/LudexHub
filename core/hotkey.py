@@ -23,7 +23,7 @@ class HotkeyManager(QObject):
         try:
             import keyboard
 
-            keyboard.add_hotkey(self._hotkey_str, self._on_hotkey)
+            keyboard.add_hotkey(self._hotkey_str, self._on_hotkey, suppress=True)
             self._registered = True
         except Exception as e:
             print(f"[LudexHub] Failed to register hotkey '{self._hotkey_str}': {e}")

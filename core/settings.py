@@ -11,6 +11,7 @@ DEFAULTS = {
     "tray_icon": "data/icons/tray.ico",
     "theme": "cyberpunk",
     "font_family": "Orbitron",
+    "position": "center",
     "scan_on_startup": True,
 }
 

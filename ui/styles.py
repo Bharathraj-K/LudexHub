@@ -22,7 +22,8 @@ COLORS = {
 }
 
 WINDOW_WIDTH = 540
-WINDOW_HEIGHT = 440
+WINDOW_HEIGHT = 300
+WINDOW_OPACITY = 0.92
 ICON_SIZE = 120
 
 
@@ -210,5 +211,20 @@ def get_stylesheet(font_family: str = "Orbitron") -> str:
 
     QPushButton#cancel:hover {{
         background-color: #352A50;
+    }}
+
+    QPushButton#close_btn {{
+        background-color: {c["surface"]};
+        color: {c["text_dim"]};
+        border: 1px solid {c["border"]};
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: bold;
+    }}
+
+    QPushButton#close_btn:hover {{
+        background-color: {c["accent"]};
+        color: #FFFFFF;
+        border: 1px solid {c["accent"]};
     }}
     """

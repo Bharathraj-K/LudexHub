@@ -31,6 +31,8 @@ def _show_settings(window: LauncherWindow, hotkey_manager: HotkeyManager) -> Non
         new_settings = dialog.get_settings()
         hotkey_manager.update(new_settings["hotkey"])
         window.update_font(new_settings.get("font_family", "Orbitron"))
+        window.update_position(new_settings.get("position", "center"))
+        window.apply_settings(new_settings)
 
 
 def main() -> None:
@@ -41,7 +43,7 @@ def main() -> None:
     settings = load_settings()
     games = get_games()
 
-    window = LauncherWindow(games, font_family=settings.get("font_family", "Orbitron"))
+    window = LauncherWindow(games, font_family=settings.get("font_family", "Orbitron"), position=settings.get("position", "center"))
 
     # System tray
     tray = TrayIcon(settings["tray_icon"])

@@ -3,5 +3,9 @@
   "tray_icon": "data/icons/tray.ico",
   "theme": "cyberpunk",
   "font_family": "Rajdhani",
-  "scan_on_startup": true
+  "position": "top-center",
+  "scan_on_startup": true,
+  "window_width": 540,
+  "window_height": 300,
+  "window_opacity": 0.5
 }

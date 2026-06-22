@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QFontDatabase
 from PySide6.QtWidgets import (
     QComboBox,
     QDialog,
     QGroupBox,
     QHBoxLayout,
+    QLabel,
     QLineEdit,
     QPushButton,
     QVBoxLayout,
@@ -25,19 +25,39 @@ FONT_OPTIONS = [
     "Helvetica",
 ]
 
+POSITION_OPTIONS = [
+    "Top Left",
+    "Top Center",
+    "Top Right",
+    "Center",
+    "Bottom Left",
+    "Bottom Center",
+    "Bottom Right",
+]
+
+POSITION_KEYS = {
+    "Top Left": "top-left",
+    "Top Center": "top-center",
+    "Top Right": "top-right",
+    "Center": "center",
+    "Bottom Left": "bottom-left",
+    "Bottom Center": "bottom-center",
+    "Bottom Right": "bottom-right",
+}
+
 
 class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("SETTINGS")
-        self.setFixedSize(420, 240)
+        self.setFixedSize(420, 440)
         self.setWindowFlags(Qt.Dialog | Qt.MSWindowsFixedSizeDialogHint)
         self._settings = load_settings()
         self._build_ui()
 
     def _build_ui(self) -> None:
         layout = QVBoxLayout(self)
-        layout.setSpacing(14)
+        layout.setSpacing(10)
         layout.setContentsMargins(16, 16, 16, 16)
 
         hotkey_group = QGroupBox("HOTKEY")
@@ -49,7 +69,6 @@ class SettingsDialog(QDialog):
         font_group = QGroupBox("FONT")
         font_layout = QHBoxLayout(font_group)
         self._font_combo = QComboBox()
-        available = QFontDatabase.families()
         for f in FONT_OPTIONS:
             self._font_combo.addItem(f)
         current_font = self._settings.get("font_family", "Orbitron")
@@ -58,6 +77,41 @@ class SettingsDialog(QDialog):
             self._font_combo.setCurrentIndex(idx)
         font_layout.addWidget(self._font_combo)
         layout.addWidget(font_group)
+
+        pos_group = QGroupBox("WINDOW POSITION")
+        pos_layout = QHBoxLayout(pos_group)
+        self._pos_combo = QComboBox()
+        for p in POSITION_OPTIONS:
+            self._pos_combo.addItem(p)
+        current_pos = self._settings.get("position", "center")
+        display = next((k for k, v in POSITION_KEYS.items() if v == current_pos), "Center")
+        idx = self._pos_combo.findText(display)
+        if idx >= 0:
+            self._pos_combo.setCurrentIndex(idx)
+        pos_layout.addWidget(self._pos_combo)
+        layout.addWidget(pos_group)
+
+        size_group = QGroupBox("WINDOW SIZE")
+        size_layout = QHBoxLayout(size_group)
+        size_layout.addWidget(QLabel("W:"))
+        self._width_input = QLineEdit(str(self._settings.get("window_width", 540)))
+        self._width_input.setFixedWidth(60)
+        size_layout.addWidget(self._width_input)
+        size_layout.addWidget(QLabel("H:"))
+        self._height_input = QLineEdit(str(self._settings.get("window_height", 300)))
+        self._height_input.setFixedWidth(60)
+        size_layout.addWidget(self._height_input)
+        size_layout.addStretch()
+        layout.addWidget(size_group)
+
+        opacity_group = QGroupBox("OPACITY")
+        opacity_layout = QHBoxLayout(opacity_group)
+        self._opacity_input = QLineEdit(str(self._settings.get("window_opacity", 0.92)))
+        self._opacity_input.setFixedWidth(60)
+        opacity_layout.addWidget(self._opacity_input)
+        opacity_layout.addWidget(QLabel("(0.0 - 1.0)"))
+        opacity_layout.addStretch()
+        layout.addWidget(opacity_group)
 
         btn_layout = QHBoxLayout()
         btn_layout.addStretch()
@@ -76,6 +130,19 @@ class SettingsDialog(QDialog):
     def _save(self) -> None:
         self._settings["hotkey"] = self._hotkey_input.text().strip() or "alt+space"
         self._settings["font_family"] = self._font_combo.currentText()
+        self._settings["position"] = POSITION_KEYS.get(self._pos_combo.currentText(), "center")
+        try:
+            self._settings["window_width"] = int(self._width_input.text().strip())
+        except ValueError:
+            pass
+        try:
+            self._settings["window_height"] = int(self._height_input.text().strip())
+        except ValueError:
+            pass
+        try:
+            self._settings["window_opacity"] = float(self._opacity_input.text().strip())
+        except ValueError:
+            pass
         save_settings(self._settings)
         self.accept()
 
