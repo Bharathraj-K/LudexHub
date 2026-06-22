@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Slot
+from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtWidgets import QLabel, QListWidget, QListWidgetItem, QVBoxLayout, QWidget
 
+from core.icon_loader import IconLoader
 from models.game import Game
 from ui.styles import COLORS
 
@@ -11,6 +13,9 @@ class ResultsList(QWidget):
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
         self._games: list[Game] = []
+        self._appid_to_items: dict[str, list[QListWidgetItem]] = {}
+        self._icon_loader = IconLoader(self)
+        self._icon_loader.image_ready.connect(self._on_icon_ready)
 
         self._layout = QVBoxLayout(self)
         self._layout.setContentsMargins(0, 0, 0, 0)
@@ -19,6 +24,7 @@ class ResultsList(QWidget):
         self._list.setObjectName("results")
         self._list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self._list.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self._list.setIconSize(self._list.iconSize().scaled(120, 45, Qt.KeepAspectRatio))
         self._layout.addWidget(self._list)
 
         self._no_results = QLabel("No games found")
@@ -29,6 +35,7 @@ class ResultsList(QWidget):
 
     def update_results(self, games: list[Game]) -> None:
         self._games = games
+        self._appid_to_items.clear()
         self._list.clear()
 
         if not games:
@@ -44,7 +51,17 @@ class ResultsList(QWidget):
             item.setData(Qt.UserRole, game)
             self._list.addItem(item)
 
+            self._appid_to_items.setdefault(game.appid, []).append(item)
+            self._icon_loader.load_icon(game.appid)
+
         self._list.setCurrentRow(0)
+
+    @Slot(str, QPixmap)
+    def _on_icon_ready(self, appid: str, pixmap: QPixmap) -> None:
+        items = self._appid_to_items.get(appid, [])
+        icon = QIcon(pixmap)
+        for item in items:
+            item.setIcon(icon)
 
     def get_selected_game(self) -> Game | None:
         item = self._list.currentItem()

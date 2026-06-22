@@ -7,11 +7,12 @@ COLORS = {
     "text_dim": "#888888",
     "selection": "#3A7AFE",
     "border": "#444444",
-    "hover": "#2A2A2A",
+    "hover": "#2E2E2E",
 }
 
 WINDOW_WIDTH = 520
-WINDOW_HEIGHT = 400
+WINDOW_HEIGHT = 420
+ICON_SIZE = 120
 
 
 def get_stylesheet() -> str:
@@ -40,14 +41,15 @@ def get_stylesheet() -> str:
         background-color: transparent;
         border: none;
         outline: none;
-        padding: 4px 0px;
+        padding: 2px 0px;
     }}
 
     QListWidget#results::item {{
         color: {c["text"]};
-        padding: 8px 14px;
+        padding: 4px 10px;
         border-radius: 4px;
         margin: 1px 4px;
+        min-height: 48px;
     }}
 
     QListWidget#results::item:selected {{
@@ -55,7 +57,7 @@ def get_stylesheet() -> str:
         color: {c["text"]};
     }}
 
-    QListWidget#results::item:hover {{
+    QListWidget#results::item:hover:!selected {{
         background-color: {c["hover"]};
     }}
 
