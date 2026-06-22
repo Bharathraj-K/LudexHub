@@ -9,7 +9,8 @@ SETTINGS_FILE = DATA_DIR / "settings.json"
 DEFAULTS = {
     "hotkey": "alt+space",
     "tray_icon": "data/icons/tray.ico",
-    "theme": "dark",
+    "theme": "cyberpunk",
+    "font_family": "Orbitron",
     "scan_on_startup": True,
 }
 

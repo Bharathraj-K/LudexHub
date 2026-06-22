@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QApplication,
     QDialog,
     QLabel,
     QPushButton,
@@ -15,56 +14,29 @@ from ui.styles import COLORS
 class HotkeyDialog(QDialog):
     def __init__(self, current_hotkey: str, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Change Hotkey")
-        self.setFixedSize(320, 160)
+        self.setWindowTitle("CHANGE HOTKEY")
+        self.setFixedSize(340, 180)
         self.setWindowFlags(Qt.Dialog | Qt.MSWindowsFixedSizeDialogHint)
-        self.setStyleSheet(f"""
-            QDialog {{
-                background-color: {COLORS["bg"]};
-                border-radius: 8px;
-            }}
-            QLabel {{
-                color: {COLORS["text"]};
-                font-size: 14px;
-            }}
-            QPushButton {{
-                background-color: {COLORS["selection"]};
-                color: {COLORS["text"]};
-                border: none;
-                border-radius: 4px;
-                padding: 8px 16px;
-                font-size: 13px;
-            }}
-            QPushButton:hover {{
-                background-color: #4A8AFF;
-            }}
-            QPushButton#cancel {{
-                background-color: {COLORS["border"]};
-            }}
-            QPushButton#cancel:hover {{
-                background-color: #555555;
-            }}
-        """)
 
         layout = QVBoxLayout(self)
-        layout.setSpacing(12)
+        layout.setSpacing(14)
         layout.setContentsMargins(20, 20, 20, 20)
 
-        self._status_label = QLabel(f"Current: {current_hotkey}")
+        self._status_label = QLabel(f"CURRENT: {current_hotkey.upper()}")
         layout.addWidget(self._status_label)
 
-        self._capture_label = QLabel("Press new key combination...")
-        self._capture_label.setStyleSheet(f"color: {COLORS['text_dim']}; font-size: 12px;")
+        self._capture_label = QLabel("PRESS NEW KEY COMBINATION...")
+        self._capture_label.setStyleSheet(f"color: {COLORS['text_dim']}; font-size: 11px;")
         layout.addWidget(self._capture_label)
 
         btn_layout = QVBoxLayout()
 
-        self._ok_btn = QPushButton("Apply")
+        self._ok_btn = QPushButton("APPLY")
         self._ok_btn.setEnabled(False)
         self._ok_btn.clicked.connect(self.accept)
         btn_layout.addWidget(self._ok_btn)
 
-        cancel_btn = QPushButton("Cancel")
+        cancel_btn = QPushButton("CANCEL")
         cancel_btn.setObjectName("cancel")
         cancel_btn.clicked.connect(self.reject)
         btn_layout.addWidget(cancel_btn)
@@ -105,8 +77,8 @@ class HotkeyDialog(QDialog):
             combo_parts.append(name)
             combo = "+".join(combo_parts)
             self._new_hotkey = combo
-            self._status_label.setText(f"New: {combo}")
-            self._capture_label.setText("Click Apply to confirm")
+            self._status_label.setText(f"NEW: {combo.upper()}")
+            self._capture_label.setText("CLICK APPLY TO CONFIRM")
             self._ok_btn.setEnabled(True)
 
     def _on_key_release(self, event) -> None:

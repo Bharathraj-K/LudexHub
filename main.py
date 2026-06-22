@@ -25,11 +25,12 @@ def _show_hotkey_dialog(hotkey_manager: HotkeyManager) -> None:
             hotkey_manager.update(new_hotkey)
 
 
-def _show_settings(hotkey_manager: HotkeyManager) -> None:
+def _show_settings(window: LauncherWindow, hotkey_manager: HotkeyManager) -> None:
     dialog = SettingsDialog()
     if dialog.exec() == QDialog.Accepted:
         new_settings = dialog.get_settings()
         hotkey_manager.update(new_settings["hotkey"])
+        window.update_font(new_settings.get("font_family", "Orbitron"))
 
 
 def main() -> None:
@@ -40,7 +41,7 @@ def main() -> None:
     settings = load_settings()
     games = get_games()
 
-    window = LauncherWindow(games)
+    window = LauncherWindow(games, font_family=settings.get("font_family", "Orbitron"))
 
     # System tray
     tray = TrayIcon(settings["tray_icon"])
@@ -50,7 +51,7 @@ def main() -> None:
         lambda: _show_hotkey_dialog(hotkey_manager)
     )
     tray.settings_requested.connect(
-        lambda: _show_settings(hotkey_manager)
+        lambda: _show_settings(window, hotkey_manager)
     )
 
     # Hotkey

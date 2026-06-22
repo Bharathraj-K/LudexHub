@@ -1,6 +1,7 @@
 {
-  "hotkey": "alt + space",
+  "hotkey": "alt+space",
   "tray_icon": "data/icons/tray.ico",
-  "theme": "dark",
+  "theme": "cyberpunk",
+  "font_family": "Rajdhani",
   "scan_on_startup": true
 }

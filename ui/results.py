@@ -11,20 +11,15 @@ from ui.styles import COLORS
 FAVORITE_STAR = "\u2605"
 EMPTY_STAR = "  "
 
-LAUNCHER_BADGES = {
-    "steam": "Steam",
-    "epic": "Epic",
-    "gog": "GOG",
-}
-
 
 class ResultsList(QWidget):
     favorite_toggled = Signal(object)
 
-    def __init__(self, favorites: set[str] | None = None, parent: QWidget | None = None):
+    def __init__(self, favorites: set[str] | None = None, font_family: str = "Orbitron", parent: QWidget | None = None):
         super().__init__(parent)
         self._games: list[Game] = []
         self._favorites = favorites or set()
+        self._font_family = font_family
         self._appid_to_items: dict[str, list[QListWidgetItem]] = {}
         self._icon_loader = IconLoader(self)
         self._icon_loader.image_ready.connect(self._on_icon_ready)
@@ -65,9 +60,7 @@ class ResultsList(QWidget):
 
         for game in games:
             star = FAVORITE_STAR if game.appid in self._favorites else EMPTY_STAR
-            badge = LAUNCHER_BADGES.get(game.launcher, "")
-            suffix = f"  [{badge}]" if badge else ""
-            item = QListWidgetItem(f" {star}  {game.name}{suffix}")
+            item = QListWidgetItem(f"  {star}   {game.name}")
             item.setData(Qt.UserRole, game)
             self._list.addItem(item)
 
