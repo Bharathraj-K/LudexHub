@@ -8,11 +8,12 @@ from core.hotkey import HotkeyManager
 from core.scanner import get_games
 from core.settings import load_settings
 from ui.hotkey_dialog import HotkeyDialog
+from ui.settings_dialog import SettingsDialog
 from ui.tray import TrayIcon
 from ui.window import LauncherWindow
 
 
-def _show_hotkey_dialog(tray: TrayIcon, hotkey_manager: HotkeyManager) -> None:
+def _show_hotkey_dialog(hotkey_manager: HotkeyManager) -> None:
     dialog = HotkeyDialog(hotkey_manager.hotkey)
     dialog.start_listening()
     result = dialog.exec()
@@ -22,6 +23,13 @@ def _show_hotkey_dialog(tray: TrayIcon, hotkey_manager: HotkeyManager) -> None:
         new_hotkey = dialog.get_new_hotkey()
         if new_hotkey:
             hotkey_manager.update(new_hotkey)
+
+
+def _show_settings(hotkey_manager: HotkeyManager) -> None:
+    dialog = SettingsDialog()
+    if dialog.exec() == QDialog.Accepted:
+        new_settings = dialog.get_settings()
+        hotkey_manager.update(new_settings["hotkey"])
 
 
 def main() -> None:
@@ -39,7 +47,10 @@ def main() -> None:
     tray.open_requested.connect(window.toggle)
     tray.refresh_requested.connect(window.refresh_games)
     tray.change_hotkey_requested.connect(
-        lambda: _show_hotkey_dialog(tray, hotkey_manager)
+        lambda: _show_hotkey_dialog(hotkey_manager)
+    )
+    tray.settings_requested.connect(
+        lambda: _show_settings(hotkey_manager)
     )
 
     # Hotkey

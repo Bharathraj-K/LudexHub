@@ -11,6 +11,7 @@ class TrayIcon(QObject):
     open_requested = Signal()
     refresh_requested = Signal()
     change_hotkey_requested = Signal()
+    settings_requested = Signal()
     exit_requested = Signal()
 
     def __init__(self, icon_path: str, parent: QObject | None = None):
@@ -34,6 +35,12 @@ class TrayIcon(QObject):
         action_refresh = QAction("Refresh Library", menu)
         action_refresh.triggered.connect(self.refresh_requested.emit)
         menu.addAction(action_refresh)
+
+        menu.addSeparator()
+
+        action_settings = QAction("Settings...", menu)
+        action_settings.triggered.connect(self.settings_requested.emit)
+        menu.addAction(action_settings)
 
         action_hotkey = QAction("Change Hotkey...", menu)
         action_hotkey.triggered.connect(self.change_hotkey_requested.emit)

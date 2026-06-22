@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from core.epic import scan_epic_games
+from core.gog import scan_gog_games
 from core.steam import find_steam_install, get_library_folders
 from models.game import Game
 
@@ -32,12 +34,12 @@ def _parse_appmanifest(path: Path) -> Game | None:
         if name.startswith("Steam Linux Runtime"):
             return None
 
-        return Game(name=name, appid=appid, library="")
+        return Game(name=name, appid=appid, library="", launcher="steam")
     except Exception:
         return None
 
 
-def scan_games() -> list[Game]:
+def _scan_steam() -> list[Game]:
     steam_path = find_steam_install()
     if steam_path is None:
         return []
@@ -56,6 +58,14 @@ def scan_games() -> list[Game]:
                 game.library = str(library)
                 games.append(game)
 
+    return games
+
+
+def scan_games() -> list[Game]:
+    games: list[Game] = []
+    games.extend(_scan_steam())
+    games.extend(scan_epic_games())
+    games.extend(scan_gog_games())
     games.sort(key=lambda g: g.name.lower())
     return games
 

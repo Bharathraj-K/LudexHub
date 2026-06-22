@@ -3,36 +3,48 @@
     "name": "Aseprite",
     "appid": "431730",
     "library": "D:\\STEAM",
+    "launcher": "steam",
+    "executable": "",
     "favorite": false
   },
   {
     "name": "Blender",
     "appid": "365670",
     "library": "E:\\SteamLibrary",
+    "launcher": "steam",
+    "executable": "",
     "favorite": false
   },
   {
     "name": "Dying Light 2: Reloaded Edition",
     "appid": "534380",
     "library": "D:\\STEAM",
+    "launcher": "steam",
+    "executable": "",
     "favorite": false
   },
   {
     "name": "Lossless Scaling",
     "appid": "993090",
     "library": "D:\\STEAM",
+    "launcher": "steam",
+    "executable": "",
     "favorite": false
   },
   {
     "name": "Onimusha: Way of the Sword DEMO",
     "appid": "3974650",
     "library": "E:\\SteamLibrary",
+    "launcher": "steam",
+    "executable": "",
     "favorite": false
   },
   {
     "name": "Overwatch\u00ae",
     "appid": "2357570",
     "library": "D:\\STEAM",
+    "launcher": "steam",
+    "executable": "",
     "favorite": false
   }
 ]

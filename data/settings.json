@@ -1,5 +1,5 @@
 {
-  "hotkey": "alt+space",
+  "hotkey": "alt + space",
   "tray_icon": "data/icons/tray.ico",
   "theme": "dark",
   "scan_on_startup": true

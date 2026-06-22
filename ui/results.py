@@ -11,6 +11,12 @@ from ui.styles import COLORS
 FAVORITE_STAR = "\u2605"
 EMPTY_STAR = "  "
 
+LAUNCHER_BADGES = {
+    "steam": "Steam",
+    "epic": "Epic",
+    "gog": "GOG",
+}
+
 
 class ResultsList(QWidget):
     favorite_toggled = Signal(object)
@@ -59,7 +65,9 @@ class ResultsList(QWidget):
 
         for game in games:
             star = FAVORITE_STAR if game.appid in self._favorites else EMPTY_STAR
-            item = QListWidgetItem(f" {star}  {game.name}")
+            badge = LAUNCHER_BADGES.get(game.launcher, "")
+            suffix = f"  [{badge}]" if badge else ""
+            item = QListWidgetItem(f" {star}  {game.name}{suffix}")
             item.setData(Qt.UserRole, game)
             self._list.addItem(item)
 
