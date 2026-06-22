@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from core.paths import get_data_dir
 from core.epic import scan_epic_games
 from core.gog import scan_gog_games
 from core.steam import find_steam_install, get_library_folders
@@ -10,7 +11,7 @@ from models.game import Game
 
 SKIP = {"Steamworks Common Redistributables"}
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+DATA_DIR = get_data_dir()
 CACHE_FILE = DATA_DIR / "games.json"
 
 

@@ -4,7 +4,9 @@ import json
 import time
 from pathlib import Path
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+from core.paths import get_data_dir
+
+DATA_DIR = get_data_dir()
 RECENTS_FILE = DATA_DIR / "recents.json"
 MAX_RECENTS = 10
 

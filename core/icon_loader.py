@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 from PySide6.QtCore import QObject, QUrl, Signal, Slot
 from PySide6.QtGui import QPixmap, QPixmapCache
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
 
-ICONS_DIR = Path(__file__).resolve().parent.parent / "data" / "icons"
+from core.paths import get_data_dir
+
+ICONS_DIR = get_data_dir() / "icons"
 CDN_BASE = "https://cdn.cloudflare.steamstatic.com/steam/apps"
 IMAGE_FILE = "capsule_sm_120.jpg"
 

@@ -3,7 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+from core.paths import get_data_dir
+
+DATA_DIR = get_data_dir()
 FAVORITES_FILE = DATA_DIR / "favorites.json"
 
 

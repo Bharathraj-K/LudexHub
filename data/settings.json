@@ -1,5 +1,5 @@
 {
-  "hotkey": "space",
+  "hotkey": "alt+space",
   "tray_icon": "data/icons/tray.ico",
   "theme": "cyberpunk",
   "font_family": "Arial",
@@ -8,6 +8,7 @@
   "steam_path": "",
   "epic_path": "",
   "gog_path": "",
+  "start_with_windows": false,
   "window_width": 540,
   "window_height": 360,
   "window_opacity": 0.95

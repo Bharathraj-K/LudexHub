@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from pathlib import Path
+from core.paths import get_assets_dir
 
-FONTS_DIR = Path(__file__).resolve().parent.parent / "assets" / "fonts"
+FONTS_DIR = get_assets_dir() / "fonts"
 
 COLORS = {
     "bg": "#0B0614",

@@ -15,7 +15,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-APP_ROOT = Path(__file__).resolve().parent.parent
+from core.paths import get_app_root
+
+APP_ROOT = get_app_root()
 SHORTCUT_NAME = "LudexHub.lnk"
 STARTUP_FOLDER = Path.home() / "AppData" / "Roaming" / "Microsoft" / "Windows" / "Start Menu" / "Programs" / "Startup"
 SHORTCUT_PATH = STARTUP_FOLDER / SHORTCUT_NAME
@@ -33,14 +35,20 @@ def set_startup(enabled: bool) -> None:
 
 
 def _create_shortcut() -> None:
-    python_exe = sys.executable
-    script_path = APP_ROOT / "main.py"
+    is_frozen = getattr(sys, 'frozen', False)
+
+    if is_frozen:
+        target = sys.executable
+        args = ""
+    else:
+        target = sys.executable
+        args = f'"{APP_ROOT / "main.py"}"'
 
     ps_script = (
         f'$ws = New-Object -ComObject WScript.Shell; '
         f'$sc = $ws.CreateShortcut("{SHORTCUT_PATH}"); '
-        f'$sc.TargetPath = "{python_exe}"; '
-        f'$sc.Arguments = "\"{script_path}\""; '
+        f'$sc.TargetPath = "{target}"; '
+        f'$sc.Arguments = "{args}"; '
         f'$sc.WorkingDirectory = "{APP_ROOT}"; '
         f'$sc.Save()'
     )

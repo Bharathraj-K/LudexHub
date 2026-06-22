@@ -8,4 +8,3 @@ data/recents.json
 *.egg-info/
 dist/
 build/
-*.spec

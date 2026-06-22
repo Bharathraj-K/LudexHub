@@ -3,12 +3,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+from core.paths import get_data_dir
+
+DATA_DIR = get_data_dir()
 SETTINGS_FILE = DATA_DIR / "settings.json"
 
 DEFAULTS = {
     "hotkey": "alt+space",
-    "tray_icon": "data/icons/tray.ico",
+    "tray_icon": str(DATA_DIR / "icons" / "tray.ico"),
     "theme": "cyberpunk",
     "font_family": "Orbitron",
     "position": "center",
