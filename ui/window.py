@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
 )
 
 from core.launcher import launch_game
+from core.scanner import get_games
 from core.search import search_games
 from models.game import Game
 from ui.results import ResultsList
@@ -21,7 +22,7 @@ class LauncherWindow(QWidget):
         self._all_games = games
         self._filtered_games: list[Game] = []
 
-        self.setWindowTitle("Game Launcher")
+        self.setWindowTitle("LudexHub")
         self.setObjectName("launcher")
         self.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
         self.setWindowFlags(
@@ -58,6 +59,16 @@ class LauncherWindow(QWidget):
         if game is not None:
             launch_game(game)
             self.hide()
+
+    def toggle(self) -> None:
+        if self.isVisible():
+            self.hide()
+        else:
+            self.show_centered()
+
+    def refresh_games(self) -> None:
+        self._all_games = get_games()
+        self._on_search(self._search_input.text())
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
         if event.key() == Qt.Key_Escape:
