@@ -5,26 +5,31 @@ from pathlib import Path
 FONTS_DIR = Path(__file__).resolve().parent.parent / "assets" / "fonts"
 
 COLORS = {
-    "bg": "#0F0A1A",
-    "surface": "#16102A",
-    "input_bg": "#1A1230",
-    "text": "#E8E4F0",
-    "text_dim": "#7A6F8A",
+    "bg": "#0B0614",
+    "surface": "#110C22",
+    "input_bg": "#150F2A",
+    "text": "#E0DCF0",
+    "text_dim": "#6B5F80",
     "accent": "#7C3AED",
     "accent_light": "#A855F7",
     "accent_dark": "#5B21B6",
-    "selection_bg": "#1E1540",
-    "border": "#2A2040",
-    "hover": "#1E1535",
+    "selection_bg": "#1A1040",
+    "border": "#2A1F45",
+    "hover": "#1C1335",
     "steam": "#FCEE09",
     "epic": "#00F0FF",
     "gog": "#FF003C",
 }
 
-WINDOW_WIDTH = 540
-WINDOW_HEIGHT = 300
+WINDOW_WIDTH = 750
+WINDOW_HEIGHT = 500
 WINDOW_OPACITY = 0.92
-ICON_SIZE = 120
+ICON_SIZE = 160
+
+TITLE_BAR_HEIGHT = 60
+FOOTER_HEIGHT = 36
+ITEM_HEIGHT = 56
+ITEM_ICON_SIZE = 42
 
 
 def get_font_path() -> str:
@@ -42,16 +47,47 @@ def get_stylesheet(font_family: str = "Orbitron") -> str:
     QWidget#launcher {{
         background-color: transparent;
         border: 1px solid {c["accent"]};
-        border-radius: 10px;
+        border-radius: 12px;
+    }}
+
+    QWidget#title_bar {{
+        background-color: transparent;
+        border: none;
+    }}
+
+    QPushButton#minimize_btn {{
+        background-color: transparent;
+        color: {c["text_dim"]};
+        border: none;
+        font-size: 18px;
+        font-weight: bold;
+        padding: 4px 8px;
+    }}
+
+    QPushButton#minimize_btn:hover {{
+        color: {c["accent_light"]};
+    }}
+
+    QPushButton#close_btn {{
+        background-color: transparent;
+        color: {c["text_dim"]};
+        border: none;
+        font-size: 18px;
+        font-weight: bold;
+        padding: 4px 8px;
+    }}
+
+    QPushButton#close_btn:hover {{
+        color: #EF4444;
     }}
 
     QLineEdit#search_input {{
         background-color: {c["input_bg"]};
         color: {c["accent_light"]};
         border: 1px solid {c["border"]};
-        border-radius: 8px;
-        padding: 12px 16px;
-        font-size: 15px;
+        border-radius: 10px;
+        padding: 12px 18px;
+        font-size: 16px;
         {font}
         selection-background-color: {c["accent"]};
         selection-color: #FFFFFF;
@@ -61,25 +97,37 @@ def get_stylesheet(font_family: str = "Orbitron") -> str:
         border: 1px solid {c["accent"]};
     }}
 
+    QLabel#hotkey_hint {{
+        background-color: {c["surface"]};
+        color: {c["text_dim"]};
+        border: 1px solid {c["border"]};
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 11px;
+        font-weight: bold;
+        font-family: 'Consolas', 'Courier New', monospace;
+    }}
+
     QListWidget#results {{
         background-color: transparent;
         border: none;
         outline: none;
-        padding: 4px 0px;
+        padding: 2px 0px;
     }}
 
     QListWidget#results::item {{
         color: {c["text"]};
-        padding: 6px 12px;
-        border-radius: 6px;
-        margin: 2px 6px;
-        min-height: 50px;
+        padding: 0px 12px;
+        border-radius: 8px;
+        margin: 2px 4px;
+        min-height: {ITEM_HEIGHT}px;
+        border-left: 3px solid transparent;
     }}
 
     QListWidget#results::item:selected {{
         background-color: {c["selection_bg"]};
         color: {c["accent_light"]};
-        border: 1px solid {c["accent"]};
+        border-left: 3px solid {c["accent"]};
     }}
 
     QListWidget#results::item:hover:!selected {{
@@ -88,9 +136,31 @@ def get_stylesheet(font_family: str = "Orbitron") -> str:
 
     QLabel#no_results {{
         color: {c["text_dim"]};
-        font-size: 13px;
+        font-size: 14px;
         padding: 24px;
         {font}
+    }}
+
+    QWidget#footer {{
+        background-color: transparent;
+        border: none;
+    }}
+
+    QLabel#footer_text {{
+        color: {c["text_dim"]};
+        font-size: 12px;
+        font-family: 'Consolas', 'Courier New', monospace;
+        border: none;
+    }}
+
+    QLabel#footer_key {{
+        color: {c["text_dim"]};
+        font-size: 12px;
+        font-family: 'Consolas', 'Courier New', monospace;
+        background-color: {c["surface"]};
+        border: 1px solid {c["border"]};
+        border-radius: 3px;
+        padding: 2px 6px;
     }}
 
     QMenu {{
@@ -211,20 +281,5 @@ def get_stylesheet(font_family: str = "Orbitron") -> str:
 
     QPushButton#cancel:hover {{
         background-color: #352A50;
-    }}
-
-    QPushButton#close_btn {{
-        background-color: {c["surface"]};
-        color: {c["text_dim"]};
-        border: 1px solid {c["border"]};
-        border-radius: 4px;
-        font-size: 14px;
-        font-weight: bold;
-    }}
-
-    QPushButton#close_btn:hover {{
-        background-color: {c["accent"]};
-        color: #FFFFFF;
-        border: 1px solid {c["accent"]};
     }}
     """

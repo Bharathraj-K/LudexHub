@@ -13,6 +13,10 @@ DEFAULTS = {
     "font_family": "Orbitron",
     "position": "center",
     "scan_on_startup": True,
+    "steam_path": "",
+    "epic_path": "",
+    "gog_path": "",
+    "start_with_windows": False,  # STARTUP FEATURE: toggled via core/startup.py
 }
 
 

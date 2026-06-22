@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+venv/
+data/icons/*.jpg
+data/settings.json
+data/favorites.json
+data/recents.json
+*.egg-info/
+dist/
+build/
+*.spec

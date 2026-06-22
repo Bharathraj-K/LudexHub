@@ -10,14 +10,16 @@ PROGRAM_DATA = Path(os.environ.get("PROGRAMDATA", r"C:\ProgramData"))
 GOG_DB = PROGRAM_DATA / "GOG.com" / "Galaxy" / "storage" / "galaxy-2.0.db"
 
 
-def scan_gog_games() -> list[Game]:
+def scan_gog_games(db_path_override: str = "") -> list[Game]:
     games: list[Game] = []
 
-    if not GOG_DB.exists():
+    db_path = Path(db_path_override) if db_path_override else GOG_DB
+
+    if not db_path.exists():
         return games
 
     try:
-        conn = sqlite3.connect(f"file:{GOG_DB}?mode=ro", uri=True)
+        conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
         cursor = conn.cursor()
         cursor.execute(
             """

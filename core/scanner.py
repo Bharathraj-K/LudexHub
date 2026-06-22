@@ -39,10 +39,15 @@ def _parse_appmanifest(path: Path) -> Game | None:
         return None
 
 
-def _scan_steam() -> list[Game]:
-    steam_path = find_steam_install()
-    if steam_path is None:
-        return []
+def _scan_steam(override: str = "") -> list[Game]:
+    override_path = Path(override) if override else None
+    if override_path and override_path.exists():
+        steam_path = override_path
+    else:
+        found = find_steam_install()
+        if found is None:
+            return []
+        steam_path = found
 
     libraries = get_library_folders(steam_path)
     games: list[Game] = []
@@ -61,11 +66,11 @@ def _scan_steam() -> list[Game]:
     return games
 
 
-def scan_games() -> list[Game]:
+def scan_games(steam_override: str = "", epic_override: str = "", gog_override: str = "") -> list[Game]:
     games: list[Game] = []
-    games.extend(_scan_steam())
-    games.extend(scan_epic_games())
-    games.extend(scan_gog_games())
+    games.extend(_scan_steam(steam_override))
+    games.extend(scan_epic_games(epic_override))
+    games.extend(scan_gog_games(gog_override))
     games.sort(key=lambda g: g.name.lower())
     return games
 
@@ -87,8 +92,8 @@ def save_cache(games: list[Game]) -> None:
         json.dump([g.to_dict() for g in games], f, indent=2)
 
 
-def get_games() -> list[Game]:
-    games = scan_games()
+def get_games(steam_override: str = "", epic_override: str = "", gog_override: str = "") -> list[Game]:
+    games = scan_games(steam_override, epic_override, gog_override)
     if games:
         save_cache(games)
     else:

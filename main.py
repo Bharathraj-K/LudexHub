@@ -41,7 +41,11 @@ def main() -> None:
     app.setApplicationName("LudexHub")
 
     settings = load_settings()
-    games = get_games()
+    games = get_games(
+        steam_override=settings.get("steam_path", ""),
+        epic_override=settings.get("epic_path", ""),
+        gog_override=settings.get("gog_path", ""),
+    )
 
     window = LauncherWindow(games, font_family=settings.get("font_family", "Orbitron"), position=settings.get("position", "center"))
 

@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
+    QCheckBox,
     QComboBox,
     QDialog,
+    QFileDialog,
     QGroupBox,
     QHBoxLayout,
     QLabel,
@@ -13,6 +15,7 @@ from PySide6.QtWidgets import (
 )
 
 from core.settings import load_settings, save_settings
+from core.startup import is_startup_enabled, set_startup  # STARTUP FEATURE
 from ui.styles import COLORS
 
 FONT_OPTIONS = [
@@ -50,7 +53,7 @@ class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("SETTINGS")
-        self.setFixedSize(420, 440)
+        self.setFixedSize(420, 660)
         self.setWindowFlags(Qt.Dialog | Qt.MSWindowsFixedSizeDialogHint)
         self._settings = load_settings()
         self._build_ui()
@@ -113,6 +116,33 @@ class SettingsDialog(QDialog):
         opacity_layout.addStretch()
         layout.addWidget(opacity_group)
 
+        paths_group = QGroupBox("LAUNCHER PATHS (leave empty for auto-detect)")
+        paths_layout = QVBoxLayout(paths_group)
+
+        for label, key in [("Steam", "steam_path"), ("Epic", "epic_path"), ("GOG", "gog_path")]:
+            row = QHBoxLayout()
+            row.addWidget(QLabel(f"{label}:"))
+            line = QLineEdit(self._settings.get(key, ""))
+            line.setPlaceholderText("Auto-detect")
+            row.addWidget(line)
+            browse = QPushButton("...")
+            browse.setFixedWidth(36)
+            browse.clicked.connect(lambda checked, ln=line: self._browse_folder(ln))
+            row.addWidget(browse)
+            paths_layout.addLayout(row)
+            setattr(self, f"_{key}_input", line)
+
+        layout.addWidget(paths_group)
+
+        # STARTUP FEATURE: checkbox to enable/disable Windows startup
+        startup_group = QGroupBox("STARTUP")
+        startup_layout = QHBoxLayout(startup_group)
+        self._startup_checkbox = QCheckBox("Start with Windows")
+        self._startup_checkbox.setChecked(is_startup_enabled())
+        startup_layout.addWidget(self._startup_checkbox)
+        startup_layout.addStretch()
+        layout.addWidget(startup_group)
+
         btn_layout = QHBoxLayout()
         btn_layout.addStretch()
 
@@ -126,6 +156,11 @@ class SettingsDialog(QDialog):
         btn_layout.addWidget(save_btn)
 
         layout.addLayout(btn_layout)
+
+    def _browse_folder(self, line_edit: QLineEdit) -> None:
+        folder = QFileDialog.getExistingDirectory(self, "Select Folder")
+        if folder:
+            line_edit.setText(folder)
 
     def _save(self) -> None:
         self._settings["hotkey"] = self._hotkey_input.text().strip() or "alt+space"
@@ -143,6 +178,11 @@ class SettingsDialog(QDialog):
             self._settings["window_opacity"] = float(self._opacity_input.text().strip())
         except ValueError:
             pass
+        self._settings["steam_path"] = self._steam_path_input.text().strip()
+        self._settings["epic_path"] = self._epic_path_input.text().strip()
+        self._settings["gog_path"] = self._gog_path_input.text().strip()
+        self._settings["start_with_windows"] = self._startup_checkbox.isChecked()
+        set_startup(self._startup_checkbox.isChecked())  # STARTUP FEATURE
         save_settings(self._settings)
         self.accept()
 

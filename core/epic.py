@@ -13,12 +13,19 @@ LAUNCHER_DAT = PROGRAM_DATA / "Epic" / "UnrealEngineLauncher" / "LauncherInstall
 SKIP_EPIC = {"Fortnite", "Unreal Editor"}
 
 
-def scan_epic_games() -> list[Game]:
+def scan_epic_games(manifest_dir_override: str = "") -> list[Game]:
     games: list[Game] = []
 
+    if manifest_dir_override:
+        manifest_dir = Path(manifest_dir_override)
+        launcher_dat = manifest_dir.parent / "LauncherInstalled.dat"
+    else:
+        manifest_dir = MANIFEST_DIR
+        launcher_dat = LAUNCHER_DAT
+
     manifest_items: dict[str, dict] = {}
-    if MANIFEST_DIR.exists():
-        for item_file in MANIFEST_DIR.glob("*.item"):
+    if manifest_dir.exists():
+        for item_file in manifest_dir.glob("*.item"):
             try:
                 with open(item_file, "r", encoding="utf-8") as f:
                     data = json.load(f)
@@ -28,11 +35,11 @@ def scan_epic_games() -> list[Game]:
             except (json.JSONDecodeError, OSError):
                 continue
 
-    if not LAUNCHER_DAT.exists():
+    if not launcher_dat.exists():
         return games
 
     try:
-        with open(LAUNCHER_DAT, "r", encoding="utf-8") as f:
+        with open(launcher_dat, "r", encoding="utf-8") as f:
             data = json.load(f)
     except (json.JSONDecodeError, OSError):
         return games

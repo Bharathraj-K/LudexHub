@@ -1,15 +1,72 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal, Slot
-from PySide6.QtGui import QAction, QIcon, QPixmap
-from PySide6.QtWidgets import QLabel, QListWidget, QListWidgetItem, QMenu, QVBoxLayout, QWidget
+from PySide6.QtGui import QColor, QFontDatabase, QIcon, QPixmap
+from PySide6.QtWidgets import QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QMenu, QVBoxLayout, QWidget
 
 from core.icon_loader import IconLoader
 from models.game import Game
 from ui.styles import COLORS
 
 FAVORITE_STAR = "\u2605"
-EMPTY_STAR = "  "
+LAUNCHER_COLORS = {
+    "steam": COLORS["steam"],
+    "epic": COLORS["epic"],
+    "gog": COLORS["gog"],
+}
+LAUNCHER_LABELS = {
+    "steam": "Steam",
+    "epic": "Epic Games",
+    "gog": "GOG",
+}
+
+
+class GameItemWidget(QWidget):
+    def __init__(self, game: Game, is_favorite: bool, font_family: str = "Orbitron", parent=None):
+        super().__init__(parent)
+        self._game = game
+
+        h = QHBoxLayout(self)
+        h.setContentsMargins(8, 4, 12, 4)
+        h.setSpacing(10)
+
+        self._icon_label = QLabel()
+        self._icon_label.setFixedSize(72, 54)
+        self._icon_label.setAlignment(Qt.AlignCenter)
+        h.addWidget(self._icon_label)
+
+        self._star_label = QLabel()
+        if is_favorite:
+            self._star_label.setText(FAVORITE_STAR)
+            self._star_label.setStyleSheet(f"color: {COLORS['accent_light']}; font-size: 16px; border: none; background: transparent;")
+        else:
+            self._star_label.setText("")
+            self._star_label.setStyleSheet("border: none; background: transparent;")
+        self._star_label.setFixedWidth(18)
+        h.addWidget(self._star_label)
+
+        self._name_label = QLabel(game.name)
+        font = f"font-family: '{font_family}';" if font_family else ""
+        self._name_label.setStyleSheet(f"color: {COLORS['text']}; font-size: 14px; {font} border: none; background: transparent;")
+        h.addWidget(self._name_label, 1)
+
+        launcher = game.launcher.lower()
+        launcher_color = LAUNCHER_COLORS.get(launcher, COLORS["text_dim"])
+        launcher_text = LAUNCHER_LABELS.get(launcher, launcher.capitalize())
+        self._launcher_label = QLabel(launcher_text)
+        self._launcher_label.setStyleSheet(f"color: {launcher_color}; font-size: 12px; border: none; background: transparent;")
+        self._launcher_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        h.addWidget(self._launcher_label)
+
+        self._arrow_label = QLabel("\u21B5")
+        self._arrow_label.setStyleSheet(f"color: {COLORS['text_dim']}; font-size: 16px; border: none; background: transparent;")
+        self._arrow_label.setAlignment(Qt.AlignCenter)
+        self._arrow_label.setFixedWidth(24)
+        h.addWidget(self._arrow_label)
+
+    def set_icon(self, pixmap: QPixmap) -> None:
+        scaled = pixmap.scaled(72, 54, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self._icon_label.setPixmap(scaled)
 
 
 class ResultsList(QWidget):
@@ -21,6 +78,7 @@ class ResultsList(QWidget):
         self._favorites = favorites or set()
         self._font_family = font_family
         self._appid_to_items: dict[str, list[QListWidgetItem]] = {}
+        self._appid_to_widget: dict[str, GameItemWidget] = {}
         self._icon_loader = IconLoader(self)
         self._icon_loader.image_ready.connect(self._on_icon_ready)
 
@@ -31,7 +89,6 @@ class ResultsList(QWidget):
         self._list.setObjectName("results")
         self._list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self._list.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self._list.setIconSize(self._list.iconSize().scaled(120, 45, Qt.KeepAspectRatio))
         self._list.setContextMenuPolicy(Qt.CustomContextMenu)
         self._list.customContextMenuRequested.connect(self._show_context_menu)
         self._layout.addWidget(self._list)
@@ -48,6 +105,7 @@ class ResultsList(QWidget):
     def update_results(self, games: list[Game]) -> None:
         self._games = games
         self._appid_to_items.clear()
+        self._appid_to_widget.clear()
         self._list.clear()
 
         if not games:
@@ -59,22 +117,26 @@ class ResultsList(QWidget):
         self._no_results.setVisible(False)
 
         for game in games:
-            star = FAVORITE_STAR if game.appid in self._favorites else EMPTY_STAR
-            item = QListWidgetItem(f"  {star}   {game.name}")
+            item = QListWidgetItem()
             item.setData(Qt.UserRole, game)
+            item.setSizeHint(self._list.iconSize())
             self._list.addItem(item)
 
+            is_fav = game.appid in self._favorites
+            widget = GameItemWidget(game, is_fav, self._font_family)
+            self._list.setItemWidget(item, widget)
+
             self._appid_to_items.setdefault(game.appid, []).append(item)
+            self._appid_to_widget[game.appid] = widget
             self._icon_loader.load_icon(game.appid)
 
         self._list.setCurrentRow(0)
 
     @Slot(str, QPixmap)
     def _on_icon_ready(self, appid: str, pixmap: QPixmap) -> None:
-        items = self._appid_to_items.get(appid, [])
-        icon = QIcon(pixmap)
-        for item in items:
-            item.setIcon(icon)
+        widget = self._appid_to_widget.get(appid)
+        if widget:
+            widget.set_icon(pixmap)
 
     def _show_context_menu(self, pos) -> None:
         item = self._list.itemAt(pos)
