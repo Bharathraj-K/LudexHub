@@ -1,18 +1,24 @@
 from __future__ import annotations
 
-from PySide6.QtCore import Qt, Slot
-from PySide6.QtGui import QIcon, QPixmap
-from PySide6.QtWidgets import QLabel, QListWidget, QListWidgetItem, QVBoxLayout, QWidget
+from PySide6.QtCore import Qt, Signal, Slot
+from PySide6.QtGui import QAction, QIcon, QPixmap
+from PySide6.QtWidgets import QLabel, QListWidget, QListWidgetItem, QMenu, QVBoxLayout, QWidget
 
 from core.icon_loader import IconLoader
 from models.game import Game
 from ui.styles import COLORS
 
+FAVORITE_STAR = "\u2605"
+EMPTY_STAR = "  "
+
 
 class ResultsList(QWidget):
-    def __init__(self, parent: QWidget | None = None):
+    favorite_toggled = Signal(object)
+
+    def __init__(self, favorites: set[str] | None = None, parent: QWidget | None = None):
         super().__init__(parent)
         self._games: list[Game] = []
+        self._favorites = favorites or set()
         self._appid_to_items: dict[str, list[QListWidgetItem]] = {}
         self._icon_loader = IconLoader(self)
         self._icon_loader.image_ready.connect(self._on_icon_ready)
@@ -25,6 +31,8 @@ class ResultsList(QWidget):
         self._list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self._list.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self._list.setIconSize(self._list.iconSize().scaled(120, 45, Qt.KeepAspectRatio))
+        self._list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._list.customContextMenuRequested.connect(self._show_context_menu)
         self._layout.addWidget(self._list)
 
         self._no_results = QLabel("No games found")
@@ -32,6 +40,9 @@ class ResultsList(QWidget):
         self._no_results.setAlignment(Qt.AlignCenter)
         self._no_results.setVisible(False)
         self._layout.addWidget(self._no_results)
+
+    def set_favorites(self, favorites: set[str]) -> None:
+        self._favorites = favorites
 
     def update_results(self, games: list[Game]) -> None:
         self._games = games
@@ -47,7 +58,8 @@ class ResultsList(QWidget):
         self._no_results.setVisible(False)
 
         for game in games:
-            item = QListWidgetItem(f"  {game.name}")
+            star = FAVORITE_STAR if game.appid in self._favorites else EMPTY_STAR
+            item = QListWidgetItem(f" {star}  {game.name}")
             item.setData(Qt.UserRole, game)
             self._list.addItem(item)
 
@@ -62,6 +74,22 @@ class ResultsList(QWidget):
         icon = QIcon(pixmap)
         for item in items:
             item.setIcon(icon)
+
+    def _show_context_menu(self, pos) -> None:
+        item = self._list.itemAt(pos)
+        if item is None:
+            return
+
+        game: Game = item.data(Qt.UserRole)
+        if game is None:
+            return
+
+        menu = QMenu(self)
+        is_fav = game.appid in self._favorites
+        action_text = "Remove from Favorites" if is_fav else "Add to Favorites"
+        action = menu.addAction(action_text)
+        action.triggered.connect(lambda: self.favorite_toggled.emit(game))
+        menu.exec(self._list.mapToGlobal(pos))
 
     def get_selected_game(self) -> Game | None:
         item = self._list.currentItem()

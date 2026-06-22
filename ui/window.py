@@ -8,7 +8,9 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from core.favorites import load_favorites, toggle_favorite
 from core.launcher import launch_game
+from core.recents import get_recent_appids
 from core.scanner import get_games
 from core.search import search_games
 from models.game import Game
@@ -20,6 +22,8 @@ class LauncherWindow(QWidget):
     def __init__(self, games: list[Game], parent: QWidget | None = None):
         super().__init__(parent)
         self._all_games = games
+        self._game_map: dict[str, Game] = {g.appid: g for g in games}
+        self._favorites = load_favorites()
         self._filtered_games: list[Game] = []
 
         self.setWindowTitle("LudexHub")
@@ -44,14 +48,36 @@ class LauncherWindow(QWidget):
         self._search_input.returnPressed.connect(self._on_launch)
         layout.addWidget(self._search_input)
 
-        self._results = ResultsList()
-        self._results.update_results(self._all_games)
+        self._results = ResultsList(favorites=self._favorites)
+        self._results.favorite_toggled.connect(self._on_toggle_favorite)
         layout.addWidget(self._results)
 
-        self._search_input.setFocus()
+        self._show_recents()
+
+    def _show_recents(self) -> None:
+        recent_ids = get_recent_appids()
+        seen: set[str] = set()
+        games: list[Game] = []
+
+        for appid in self._favorites:
+            if appid in self._game_map:
+                games.append(self._game_map[appid])
+                seen.add(appid)
+
+        for appid in recent_ids:
+            if appid in self._game_map and appid not in seen:
+                games.append(self._game_map[appid])
+                seen.add(appid)
+
+        self._results.set_favorites(self._favorites)
+        self._results.update_results(games)
 
     def _on_search(self, text: str) -> None:
+        if not text.strip():
+            self._show_recents()
+            return
         self._filtered_games = search_games(text, self._all_games)
+        self._results.set_favorites(self._favorites)
         self._results.update_results(self._filtered_games)
 
     def _on_launch(self) -> None:
@@ -59,6 +85,11 @@ class LauncherWindow(QWidget):
         if game is not None:
             launch_game(game)
             self.hide()
+
+    def _on_toggle_favorite(self, game: Game) -> None:
+        toggle_favorite(game.appid)
+        self._favorites = load_favorites()
+        self._on_search(self._search_input.text())
 
     def toggle(self) -> None:
         if self.isVisible():
@@ -68,6 +99,7 @@ class LauncherWindow(QWidget):
 
     def refresh_games(self) -> None:
         self._all_games = get_games()
+        self._game_map = {g.appid: g for g in self._all_games}
         self._on_search(self._search_input.text())
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
@@ -92,3 +124,4 @@ class LauncherWindow(QWidget):
         self.activateWindow()
         self._search_input.setFocus()
         self._search_input.clear()
+        self._show_recents()

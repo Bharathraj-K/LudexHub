@@ -5,6 +5,7 @@ COLORS = {
     "input_bg": "#2D2D2D",
     "text": "#FFFFFF",
     "text_dim": "#888888",
+    "text_star": "#FFD700",
     "selection": "#3A7AFE",
     "border": "#444444",
     "hover": "#2E2E2E",
@@ -65,5 +66,23 @@ def get_stylesheet() -> str:
         color: {c["text_dim"]};
         font-size: 14px;
         padding: 20px;
+    }}
+
+    QMenu {{
+        background-color: {c["input_bg"]};
+        color: {c["text"]};
+        border: 1px solid {c["border"]};
+        border-radius: 4px;
+        padding: 4px;
+    }}
+
+    QMenu::item {{
+        padding: 6px 20px;
+        border-radius: 3px;
+    }}
+
+    QMenu::item:selected {{
+        background-color: {c["selection"]};
+        color: {c["text"]};
     }}
     """
